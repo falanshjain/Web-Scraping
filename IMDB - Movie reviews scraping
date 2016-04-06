@@ -1,0 +1,42 @@
+# This code will scrape movie reviews of the movie Batman vs Superman which can be cleaned and then used for various analysis
+
+#Add file path
+setwd("File path")
+
+getUrls <- function(){
+  root="http://www.imdb.com/title/tt2975590/reviews?start="
+  urls <- NULL
+    for (i in 0:200){
+      calc <- i*10 
+      urls <- c(urls,(paste(root,calc,sep="")))
+    }
+  return(urls)
+}
+
+
+getReviews <- function(){
+len <- 1
+cell <- 0
+for (url in getUrls())
+{
+  batVsSup_movie <- read_html(url)
+  dd <- batVsSup_movie %>% html_node("[id=tn15content]") %>% html_nodes("p") %>% html_text()
+  
+  newLength <- 0
+  for(i in len:(len + length(dd)))
+  {
+    newLength <- newLength + 1
+      cell[i] <- dd[newLength]  
+  }
+  len <- len + length(dd)
+}
+finalReviews <- data.frame(cell)
+return(finalReviews)
+}
+#View(getReviews())
+
+new <- getReviews()
+edited <- subset(getReviews(), new$cell != "*** This review may contain spoilers ***" )
+write.csv(getReviews(), file="my_solution.csv", row.names=FALSE)
+
+View(edited)
